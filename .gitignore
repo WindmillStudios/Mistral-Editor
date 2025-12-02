@@ -1,6 +1,66 @@
-.idea
-.vs
-.vscode
-cmake-build*
-out
-build
+# ==============================================================================
+# Build & Output Directories
+# ==============================================================================
+cmake-build-*/
+build/
+bin/
+lib/
+out/
+dist/
+target/
+
+# ==============================================================================
+# IDEs & Editors
+# ==============================================================================
+# JetBrains
+.idea/
+
+# Visual Studio and Visual Studio Code
+.vscode/
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# ==============================================================================
+# Compiled Binaries & Libraries
+# ==============================================================================
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+*.pdb
+*.ilk
+*.exp
+
+# ==============================================================================
+# OS & System Files
+# ==============================================================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==============================================================================
+# Generated Configuration Files
+# ==============================================================================
+# Format file downloaded from style repo
+.clang-format
+
+# CMake cache files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
