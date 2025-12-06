@@ -3,13 +3,13 @@
 #include <imgui.h>
 
 #include "Component.h"
-#include "game/ComponentTest.h"
+// #include "game/ComponentTest.h"
 #include "Inspector.h"
 #include "misc/cpp/imgui_stdlib.h"
 
 void Vendaval::Editors::Hyerarchy::CreateEvent()
 {
-	Mistral::CreateComponent<ComponentTest>();
+	// Mistral::CreateComponent<ComponentTest>();
 }
 
 void Vendaval::Editors::Hyerarchy::RenderEvent()
@@ -79,7 +79,7 @@ void Vendaval::Editors::Hyerarchy::RenderContextMenu(Mistral::Component* compone
 	{
 		if (ImGui::MenuItem("Add component"))
 		{
-			component->CreateChild<ComponentTest>();
+			// component->CreateChild<ComponentTest>();
 		}
 
 		const auto menuItemDeleteString = "Remove " + component->GetName();

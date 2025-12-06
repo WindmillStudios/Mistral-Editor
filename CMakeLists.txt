@@ -1,20 +1,36 @@
-project(vendaval)
+cmake_minimum_required(VERSION 3.16)
+project(editor)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Executable
-add_executable(${PROJECT_NAME}
-		main.cpp
-		VendavalRenderPipeline.h
-		VendavalRenderPipeline.cpp
-		Editor.h
-		Editor.cpp
-)
+add_executable(${PROJECT_NAME} src/main.cpp)
+add_subdirectory(src)
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-add_subdirectory(editors)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PUBLIC floresta_lib)
+# Dependencies
+if (NOT TARGET mistral)
+	FetchContent_Declare(
+			mistral
+			GIT_REPOSITORY https://github.com/WindmillStudios/Mistral-Core.git
+			GIT_TAG main
+	)
+	FetchContent_MakeAvailable(mistral)
+endif ()
+target_link_libraries(${PROJECT_NAME} PUBLIC mistral)
+
+# Copy resources directory into build path
+add_custom_target(copy_resources_editor ALL
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_SOURCE_DIR}/mistral-editor/resources
+		${CMAKE_BINARY_DIR}/mistral-editor/editor_resources
+)
+add_dependencies(${PROJECT_NAME} copy_resources_editor)
 
 # Generate resources
-set(GEN_SCRIPT "${CMAKE_SOURCE_DIR}/cmake/ScanResources.cmake")
+set(GEN_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ScanResources.cmake")
 set(RES_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 set(RES_OUTPUT_FILE "${CMAKE_BINARY_DIR}/generated/EditorResources.h")
 set(FUNC_NAME "Mistral::GetEditorResourcesPath()")
@@ -40,5 +56,3 @@ set(LOCAL_STYLE_FILE "${CMAKE_CURRENT_LIST_DIR}/.clang-format")
 message(${LOCAL_STYLE_FILE})
 
 file(DOWNLOAD "${STYLE_URL}" "${LOCAL_STYLE_FILE}" SHOW_PROGRESS)
-
-add_subdirectory(src)

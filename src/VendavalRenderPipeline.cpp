@@ -7,7 +7,7 @@
 #include "editors/Scene.h"
 #include "extras/FA6FreeSolidFontData.h"
 #include "extras/IconsFontAwesome6.h"
-#include "game/SpatialTest.h"
+// #include "game/SpatialTest.h"
 
 namespace
 {
