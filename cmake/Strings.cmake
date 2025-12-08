@@ -1,0 +1,7 @@
+function(capitalize_string input_string output_variable)
+	string(TOLOWER "${input_string}" str_lower)
+	string(SUBSTRING "${str_lower}" 0 1 first_char)
+	string(TOUPPER "${first_char}" first_char_upper)
+	string(SUBSTRING "${str_lower}" 1 -1 rest_of_str)
+	set(${output_variable} "${first_char_upper}${rest_of_str}" PARENT_SCOPE)
+endfunction()
