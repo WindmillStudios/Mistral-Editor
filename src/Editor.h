@@ -41,6 +41,7 @@ namespace Vendaval
 		}
 		return nullptr;
 	}
+
 	Editor& GetEditor(const std::string& editorName);
 
 	// Event callbacks
@@ -54,20 +55,30 @@ namespace Vendaval
 
 	void EditorsPostRenderEventCallback();
 
+	void GenerateDefaultLayout();
+
 	class Editor
 	{
 	  public:
 
 		explicit Editor();
 
+		explicit Editor(uint32_t dockSpaceId);
+
 		virtual ~Editor() = default;
 
 		void RenderInWindow();
 
 		// Getters
-		[[nodiscard]] virtual const char* GetTypeName() const = 0;
+		[[nodiscard]] static const char* GetTypeName()
+		{
+			return "Editor";
+		}
 
-		[[nodiscard]] virtual const char* GetTypeIcon() const = 0;
+		[[nodiscard]] static const char* GetTypeIcon()
+		{
+			return ICON_FA_QUESTION;
+		}
 
 		[[nodiscard]] std::string GetId() const;
 
@@ -105,5 +116,6 @@ namespace Vendaval
 
 		const std::string mId;
 		std::string mName;
+		uint32_t mDockSpaceId;
 	};
 } // namespace Vendaval

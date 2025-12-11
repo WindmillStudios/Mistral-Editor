@@ -10,15 +10,15 @@ namespace Vendaval::Editors
 	{
 	  public:
 
-		Scene();
+		using Editor::Editor;
 
 		// Getters
-		[[nodiscard]] const char* GetTypeName() const override
+		[[nodiscard]] static const char* GetTypeName()
 		{
 			return "Scene";
 		}
 
-		[[nodiscard]] const char* GetTypeIcon() const override
+		[[nodiscard]] static const char* GetTypeIcon()
 		{
 			return ICON_FA_CUBE;
 		}
@@ -28,6 +28,8 @@ namespace Vendaval::Editors
 		[[nodiscard]] RenderTexture2D* GetViewportTexture();
 
 		// Events
+		void CreateEvent() override;
+
 		void RenderEvent() override;
 
 		void PostRenderEvent() override;
@@ -36,4 +38,4 @@ namespace Vendaval::Editors
 		Vec2 mViewportPanelSize;
 		Camera3D mCamera;
 	};
-} // namespace Vendaval
+} // namespace Vendaval::Editors

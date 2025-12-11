@@ -1,10 +1,14 @@
 #include "Editor.h"
 
+#include <format>
 #include <map>
 #include <ranges>
 
 #include "Color.h"
-#include "extras/IconsFontAwesome6.h"
+#include "editors/FileExplorer.h"
+#include "editors/Hierarchy.h"
+#include "editors/Inspector.h"
+#include "editors/Scene.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "Mistral.h"
@@ -14,8 +18,15 @@ static std::map<std::string, std::shared_ptr<Vendaval::Editor>, std::less<>> edi
 static std::vector<std::string> createList;
 static std::vector<std::string> destroyList;
 
-Vendaval::Editor::Editor():
-	mId(GenerateUUID())
+Vendaval::Editor::Editor() :
+	mId(GenerateUUID()),
+	mDockSpaceId(0)
+{
+}
+
+Vendaval::Editor::Editor(const uint32_t dockSpaceId) :
+	mId(GenerateUUID()),
+	mDockSpaceId(dockSpaceId)
 {
 }
 
@@ -27,6 +38,13 @@ void Vendaval::Editor::RenderInWindow()
 	ImGui::PushStyleVar(ImGuiStyleVar_DockingSeparatorSize, 0);
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, Color4(.15f).ToUInt32());
 
+	if (mDockSpaceId != 0)
+	{
+		ImGui::SetNextWindowDockID(mDockSpaceId);
+		mDockSpaceId = 0;
+	}
+
+	ImGui::SetNextWindowSize({200.f, 200.f}, ImGuiCond_FirstUseEver);
 	ImGui::Begin(mName.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, Vec2(5.f));
@@ -41,6 +59,7 @@ void Vendaval::Editor::RenderInWindow()
 	const auto headerHeight = ImGui::CalcTextSize("A").y +
 							  ImGui::GetStyle().FramePadding.y * 2.f +
 							  ImGui::GetStyle().WindowPadding.y * 2.f;
+	ImGuiID currentDockNodeId = ImGui::GetWindowDockID();
 	ImGui::BeginChild("Header", Vec2(0, headerHeight),
 					  ImGuiChildFlags_AlwaysUseWindowPadding);
 	if (ImGui::Button(ICON_FA_BARS " " ICON_FA_CARET_DOWN))
@@ -49,18 +68,35 @@ void Vendaval::Editor::RenderInWindow()
 	}
 	if (ImGui::BeginPopup("EditorSelectorPopup"))
 	{
-		if (ImGui::MenuItem(ICON_FA_CUBE " Scene"))
+		if (ImGui::MenuItem((std::string(Editors::Scene::GetTypeIcon()) + " " +
+							 std::string(Editors::Scene::GetTypeName()))
+								.c_str()))
 		{
+			CreateEditor<Editors::Scene>(currentDockNodeId);
+			DestroyEditor(GetId());
 		}
-		if (ImGui::MenuItem(ICON_FA_MAGNIFYING_GLASS " Inspector"))
+		if (ImGui::MenuItem((std::string(Editors::Inspector::GetTypeIcon()) + " " +
+							 std::string(Editors::Inspector::GetTypeName()))
+								.c_str()))
 		{
+			CreateEditor<Editors::Inspector>(currentDockNodeId);
+			DestroyEditor(GetId());
 		}
-		if (ImGui::MenuItem(ICON_FA_FOLDER_TREE " Hyerarchy"))
+		if (ImGui::MenuItem((std::string(Editors::Hierarchy::GetTypeIcon()) + " " +
+							 std::string(Editors::Hierarchy::GetTypeName()))
+								.c_str()))
 		{
+			CreateEditor<Editors::Hierarchy>(currentDockNodeId);
+			DestroyEditor(GetId());
 		}
-		if (ImGui::MenuItem(ICON_FA_CAMERA " Rendering"))
+		if (ImGui::MenuItem((std::string(Editors::FileExplorer::GetTypeIcon()) + " " +
+							 std::string(Editors::FileExplorer::GetTypeName()))
+								.c_str()))
 		{
+			CreateEditor<Editors::FileExplorer>(currentDockNodeId);
+			DestroyEditor(GetId());
 		}
+
 		ImGui::EndPopup();
 	}
 	ImGui::EndChild();
@@ -133,25 +169,33 @@ std::map<std::string, std::shared_ptr<Vendaval::Editor>, std::less<>> Vendaval::
 
 void Vendaval::EditorsCreateEventCallback()
 {
-	for (const auto& editorId : createList)
+	if (!createList.empty())
 	{
-		editors[editorId]->CreateEvent();
+		for (const auto& editorId : createList)
+		{
+			editors[editorId]->CreateEvent();
+		}
+		createList.clear();
 	}
-	createList.clear();
 }
 
 void Vendaval::EditorsDestroyEventCallback()
 {
-	for (const auto& editorId : destroyList)
+	if (!destroyList.empty())
 	{
-		editors[editorId]->DestroyEvent();
+		for (const auto& editorId : destroyList)
+		{
+			editors[editorId]->DestroyEvent();
+			editors.erase(editorId);
+		}
+		destroyList.clear();
 	}
-	destroyList.clear();
 }
 
 void Vendaval::EditorsRenderEventCallback()
 {
 	ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, Color4::Transparent.ToUInt32());
+	GenerateDefaultLayout();
 	ImGui::DockSpaceOverViewport(ImGui::GetID("DockSpace"), ImGui::GetMainViewport(),
 								 ImGuiDockNodeFlags_NoTabBar);
 	ImGui::PopStyleColor();
@@ -175,5 +219,32 @@ void Vendaval::EditorsPostRenderEventCallback()
 	for (const auto& editor : editors | std::views::values)
 	{
 		editor->PostRenderEvent();
+	}
+}
+
+void Vendaval::GenerateDefaultLayout()
+{
+	if (const auto dockSpaceId = ImGui::GetID("DockSpace");
+		ImGui::DockBuilderGetNode(dockSpaceId) == nullptr)
+	{
+		CreateEditor<Editors::Scene>();
+		CreateEditor<Editors::Hierarchy>();
+		CreateEditor<Editors::Inspector>();
+
+		ImGui::DockBuilderRemoveNode(dockSpaceId);
+		ImGui::DockBuilderAddNode(dockSpaceId, ImGuiDockNodeFlags_DockSpace);
+		ImGui::DockBuilderSetNodeSize(dockSpaceId, ImGui::GetMainViewport()->Size);
+
+		ImGuiID mainId = dockSpaceId;
+		ImGuiID leftTopId =
+			ImGui::DockBuilderSplitNode(mainId, ImGuiDir_Left, .2f, nullptr, &mainId);
+		ImGuiID leftBottomId = ImGui::DockBuilderSplitNode(leftTopId, ImGuiDir_Down, .5f,
+														   nullptr, &leftTopId);
+
+		ImGui::DockBuilderDockWindow("Scene", mainId);
+		ImGui::DockBuilderDockWindow("Inspector", leftTopId);
+		ImGui::DockBuilderDockWindow("Hierarchy", leftBottomId);
+
+		ImGui::DockBuilderFinish(dockSpaceId);
 	}
 }

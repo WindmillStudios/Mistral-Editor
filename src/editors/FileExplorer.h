@@ -4,21 +4,21 @@
 
 namespace Vendaval::Editors
 {
-	class Camera final : public Editor
+	class FileExplorer final : public Editor
 	{
-	  public:
+	public:
 
 		using Editor::Editor;
 
 		// Getters
 		[[nodiscard]] static const char* GetTypeName()
 		{
-			return "Camera";
+			return "FileExplorer";
 		}
 
 		[[nodiscard]] static const char* GetTypeIcon()
 		{
-			return ICON_FA_CAMERA;
+			return ICON_FA_FOLDER;
 		}
 
 		// Events

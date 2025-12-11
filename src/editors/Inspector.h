@@ -9,13 +9,15 @@ namespace Vendaval::Editors
 	{
 	  public:
 
+		using Editor::Editor;
+
 		// Getters
-		[[nodiscard]] const char* GetTypeName() const override
+		[[nodiscard]] static const char* GetTypeName()
 		{
 			return "Inspector";
 		}
 
-		[[nodiscard]] const char* GetTypeIcon() const override
+		[[nodiscard]] static const char* GetTypeIcon()
 		{
 			return ICON_FA_MAGNIFYING_GLASS;
 		}

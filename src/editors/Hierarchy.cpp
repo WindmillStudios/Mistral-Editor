@@ -1,4 +1,4 @@
-#include "Hyerarchy.h"
+#include "Hierarchy.h"
 
 #include <imgui.h>
 
@@ -7,12 +7,12 @@
 #include "Inspector.h"
 #include "misc/cpp/imgui_stdlib.h"
 
-void Vendaval::Editors::Hyerarchy::CreateEvent()
+void Vendaval::Editors::Hierarchy::CreateEvent()
 {
 	// Mistral::CreateComponent<ComponentTest>();
 }
 
-void Vendaval::Editors::Hyerarchy::RenderEvent()
+void Vendaval::Editors::Hierarchy::RenderEvent()
 {
 	for (const auto& component : Mistral::GetComponentsView())
 	{
@@ -29,7 +29,7 @@ void Vendaval::Editors::Hyerarchy::RenderEvent()
 	}
 }
 
-void Vendaval::Editors::Hyerarchy::RenderTreeItem(Mistral::Component* component)
+void Vendaval::Editors::Hierarchy::RenderTreeItem(Mistral::Component* component)
 {
 	const auto inspectorEditor = GetEditor<Inspector>();
 
@@ -73,7 +73,7 @@ void Vendaval::Editors::Hyerarchy::RenderTreeItem(Mistral::Component* component)
 	ImGui::PopID();
 }
 
-void Vendaval::Editors::Hyerarchy::RenderContextMenu(Mistral::Component* component)
+void Vendaval::Editors::Hierarchy::RenderContextMenu(Mistral::Component* component)
 {
 	if (ImGui::BeginPopupContextItem())
 	{

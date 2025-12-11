@@ -1,21 +1,23 @@
 #pragma once
 
-#include "Editor.h"
 #include "Component.h"
+#include "Editor.h"
 
 namespace Vendaval::Editors
 {
-	class Hyerarchy final : public Editor
+	class Hierarchy final : public Editor
 	{
 	  public:
 
+		using Editor::Editor;
+
 		// Getters
-		[[nodiscard]] const char* GetTypeName() const override
+		[[nodiscard]] static const char* GetTypeName()
 		{
-			return "Hyerarchy";
+			return "Hierarchy";
 		}
 
-		[[nodiscard]] const char* GetTypeIcon() const override
+		[[nodiscard]] static const char* GetTypeIcon()
 		{
 			return ICON_FA_FOLDER_TREE;
 		}
@@ -33,4 +35,4 @@ namespace Vendaval::Editors
 
 		bool mRenaming = false;
 	};
-} // namespace Vendaval
+} // namespace Vendaval::Editors

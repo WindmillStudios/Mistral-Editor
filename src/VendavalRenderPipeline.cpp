@@ -1,13 +1,11 @@
 #include "VendavalRenderPipeline.h"
 
 #include "EditorResources.h"
-#include "editors/Camera.h"
-#include "editors/Hyerarchy.h"
-#include "editors/Inspector.h"
+#include "editors/Hierarchy.h"
 #include "editors/Scene.h"
 #include "extras/FA6FreeSolidFontData.h"
 #include "extras/IconsFontAwesome6.h"
-// #include "game/SpatialTest.h"
+#include "imgui_internal.h"
 
 namespace
 {
@@ -18,17 +16,10 @@ void Vendaval::VendavalRenderPipeline::Initialize()
 {
 	auto& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.IniFilename = "layout.ini";
+	// io.IniFilename = "layout.ini";
+	io.IniFilename = nullptr;
 
 	InitFonts();
-
-	CreateEditor<Editors::Scene>();
-	CreateEditor<Editors::Scene>();
-	CreateEditor<Editors::Scene>();
-	CreateEditor<Editors::Scene>();
-	CreateEditor<Editors::Hyerarchy>();
-	CreateEditor<Editors::Camera>();
-	CreateEditor<Editors::Inspector>();
 }
 
 void Vendaval::VendavalRenderPipeline::RenderEvent()
@@ -109,7 +100,6 @@ void Vendaval::VendavalRenderPipeline::InitFonts()
 	constexpr float fontSize = 18.f;
 	static constexpr ImWchar iconsRanges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
 	io.Fonts->Clear();
-	std::cout << RESOURCES::FONTS::JETBRAINSMONO_REGULAR << std::endl;
 	io.Fonts->AddFontFromFileTTF(RESOURCES::FONTS::JETBRAINSMONO_REGULAR.string().c_str(),
 								 fontSize);
 
